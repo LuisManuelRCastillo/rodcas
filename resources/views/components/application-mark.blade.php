@@ -1,0 +1,1 @@
+<img src="/assets/img/logoSF.png" alt="" style="max-width: 300px; height: auto;">
