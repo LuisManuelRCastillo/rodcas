@@ -12,8 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cotizacion_detalles', function (Blueprint $table) {
-            $table->string('descripcion')->nullable();
-            $table->unsignedBigInteger('id_producto')->nullable()->change();
+            if (!Schema::hasColumn('cotizacion_detalles', 'descripcion')) {
+                $table->string('descripcion')->nullable();
+            }
         });
     }
 
