@@ -8,7 +8,7 @@ class CotizacionDetalle extends Model
 {
      protected $table = 'cotizacion_detalles';
        public $timestamps = false;
-    protected $fillable = ['id_cotizacion', 'id_producto', 'cantidad', 'precio_unitario'];
+    protected $fillable = ['id_cotizacion', 'descripcion', 'id_producto', 'cantidad', 'precio_unitario'];
 
     public function cotizacion()
     {

@@ -13,10 +13,9 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class CotizacionController extends Controller
 {
-    //
     public function createView()
     {
-        $clientes = Cliente::all();
+        $clientes = Cliente::orderBy('name')->get();
         return view('quotes.quotesCreate', compact('clientes'));
     }
 
@@ -24,74 +23,85 @@ class CotizacionController extends Controller
     public function buscarProductos(Request $request)
     {
         $query = $request->get('q', '');
-        $productos = Producto::where('producto', 'LIKE', "%{$query}%")->get();
+        $productos = Producto::where('producto', 'LIKE', "%{$query}%")
+            ->orWhere('codigo', 'LIKE', "%{$query}%")
+            ->limit(15)
+            ->get();
         return response()->json($productos);
     }
 
     // Guardar cotización
     public function store(Request $request)
     {
+        $request->validate([
+            'id_cliente' => 'required|exists:customers,id',
+            'detalles'   => 'required|array|min:1',
+        ]);
+
         DB::beginTransaction();
         try {
             $cotizacion = Cotizacion::create([
                 'id_cliente' => $request->id_cliente,
-                'subtotal' => 0,
-                'iva' => 0,
-                'total' => 0,
-                'estatus' => 'pendiente'
+                'subtotal'   => 0,
+                'iva'        => 0,
+                'total'      => 0,
+                'estatus'    => 'pendiente'
             ]);
 
             $subtotal = 0;
 
             foreach ($request->detalles as $detalle) {
-                $producto = Producto::findOrFail($detalle['id_producto']);
-                $precio = $detalle['precio_unitario'] ?? $producto->p_venta;
-                $linea = $precio * $detalle['cantidad'];
+                $idProducto  = !empty($detalle['id_producto']) ? $detalle['id_producto'] : null;
+                $descripcion = $detalle['descripcion'] ?? null;
+                $precio      = floatval($detalle['precio_unitario'] ?? 0);
+                $cantidad    = intval($detalle['cantidad'] ?? 1);
+
+                // Si viene de la BD, usar el nombre del producto como descripción
+                if ($idProducto) {
+                    $producto    = Producto::findOrFail($idProducto);
+                    $descripcion = $descripcion ?: $producto->producto;
+                    $precio      = $precio ?: $producto->p_venta;
+                }
+
+                $linea = $precio * $cantidad;
 
                 CotizacionDetalle::create([
-                    'id_cotizacion' => $cotizacion->id_cotizacion,
-                    'id_producto' => $producto->id_producto,
-                    'cantidad' => $detalle['cantidad'],
-                    'precio_unitario' => $precio
+                    'id_cotizacion'   => $cotizacion->id_cotizacion,
+                    'descripcion'     => $descripcion,
+                    'id_producto'     => $idProducto,
+                    'cantidad'        => $cantidad,
+                    'precio_unitario' => $precio,
                 ]);
 
                 $subtotal += $linea;
             }
 
-            $iva = $subtotal * 0.16;
-            $total = $subtotal;
-
             $cotizacion->update([
                 'subtotal' => $subtotal,
-                'iva' => $iva,
-                'total' => $total
+                'iva'      => 0,
+                'total'    => $subtotal
             ]);
 
             DB::commit();
-            // Cargar cotización completa
-$cotizacion = Cotizacion::with('cliente', 'detalles.producto')
+
+            $cotizacion = Cotizacion::with('cliente', 'detalles.producto')
                 ->find($cotizacion->id_cotizacion);
 
-// Generar PDF
-$pdf = Pdf::loadView('quotes.pdf', compact('cotizacion'));
+            $pdf = Pdf::loadView('quotes.pdf', compact('cotizacion'))
+                ->setPaper('letter', 'portrait');
 
-// Descargar PDF automáticamente
-return $pdf->download('cotizacion_'.$cotizacion->id_cotizacion.'.pdf');
-
-
-            return redirect()->route('cotizaciones.show', $cotizacion->id_cotizacion)
-                             ->with('success', 'Cotización creada correctamente');
+            return $pdf->download('cotizacion_' . $cotizacion->id_cotizacion . '.pdf');
 
         } catch (\Exception $e) {
             DB::rollBack();
-            return redirect()->back()->withErrors($e->getMessage());
+            return redirect()->back()->withErrors($e->getMessage())->withInput();
         }
     }
 
     // Listar cotizaciones
     public function indexView()
     {
-        $cotizaciones = Cotizacion::with('cliente')->get();
+        $cotizaciones = Cotizacion::with('cliente')->latest('id_cotizacion')->get();
         return view('quotes.quote', compact('cotizaciones'));
     }
 

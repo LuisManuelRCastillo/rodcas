@@ -1,7 +1,15 @@
 {
   "permissions": {
     "allow": [
-      "Bash(php artisan tinker:*)"
+      "Bash(php artisan tinker:*)",
+      "Bash(xargs grep -l \"productos\")",
+      "Bash(php artisan make:migration add_descripcion_to_cotizacion_detalles_table --table=cotizacion_detalles)",
+      "Bash(php artisan migrate)",
+      "Bash(php artisan migrate --force)",
+      "Bash(php artisan migrate:status)",
+      "Bash(php artisan migrate --pretend --path=database/migrations/2025_09_06_170214_create_clientes_table.php)",
+      "Bash(php artisan db:seed --class=MarkMigrationsAsRun)",
+      "Bash(php artisan migrate --force --path=database/migrations/2026_03_05_033950_add_descripcion_to_cotizacion_detalles_table.php)"
     ]
   }
 }
