@@ -60,6 +60,7 @@ class FacturaController extends Controller
         $solicitudes = SolicitudFactura::latest()->get()->map(function ($s) {
             if ($s->id_venta) {
                 $s->venta = DB::table('sales')->where('id', $s->id_venta)->first();
+                $s->detalles = DB::table('sale_details')->where('sale_id', $s->id_venta)->get();
             }
             return $s;
         });

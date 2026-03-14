@@ -198,7 +198,7 @@
                     </thead>
                     <tbody>
                         @foreach($lista as $s)
-                        <tr>
+                        <tr style="cursor:pointer;" onclick="toggleDetalle({{ $s->id }})">
                             <td style="color:#9ca3af;font-size:.78rem;">{{ $s->id }}</td>
                             <td>
                                 @if($s->id_venta && isset($s->venta))
@@ -215,7 +215,7 @@
                             <td style="font-size:.8rem;">{{ $s->regimen_fiscal }}</td>
                             <td style="font-size:.8rem;">{{ $s->uso_cfdi }}</td>
                             <td>
-                                <a href="mailto:{{ $s->email }}" style="color:var(--brand);text-decoration:none;">
+                                <a href="mailto:{{ $s->email }}" style="color:var(--brand);text-decoration:none;" onclick="event.stopPropagation()">
                                     {{ $s->email }}
                                 </a>
                             </td>
@@ -225,7 +225,7 @@
                                     {{ ucfirst($s->estatus) }}
                                 </span>
                             </td>
-                            <td>
+                            <td onclick="event.stopPropagation()">
                                 @if($s->estatus === 'pendiente')
                                     <form method="POST" action="{{ route('facturas.completar', $s->id) }}">
                                         @csrf @method('PATCH')
@@ -234,11 +234,61 @@
                                 @endif
                             </td>
                         </tr>
+                        {{-- Fila de detalles expandible --}}
+                        <tr id="detalle-{{ $s->id }}" style="display:none;">
+                            <td colspan="11" style="padding:0;background:#fafafa;">
+                                <div style="padding:.75rem 1.5rem 1rem;">
+                                    @if(!empty($s->detalles) && count($s->detalles))
+                                        <div style="font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#9ca3af;margin-bottom:.5rem;">
+                                            Detalle de compra
+                                            @if(isset($s->venta)) — {{ $s->venta->invoice_number }} &nbsp;·&nbsp; {{ \Carbon\Carbon::parse($s->venta->sale_date)->format('d/m/Y H:i') }} @endif
+                                        </div>
+                                        <table style="width:100%;border-collapse:collapse;font-size:.82rem;">
+                                            <thead>
+                                                <tr style="border-bottom:1px solid #e5e7eb;">
+                                                    <th style="text-align:left;padding:.3rem .5rem;color:#6b7280;font-weight:600;">Producto</th>
+                                                    <th style="text-align:center;padding:.3rem .5rem;color:#6b7280;font-weight:600;">Cant.</th>
+                                                    <th style="text-align:right;padding:.3rem .5rem;color:#6b7280;font-weight:600;">P. Unit.</th>
+                                                    <th style="text-align:right;padding:.3rem .5rem;color:#6b7280;font-weight:600;">Total</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($s->detalles as $d)
+                                                <tr style="border-bottom:1px solid #f3f4f6;">
+                                                    <td style="padding:.35rem .5rem;">{{ $d->product_name }}</td>
+                                                    <td style="padding:.35rem .5rem;text-align:center;color:#6b7280;">{{ $d->quantity }}</td>
+                                                    <td style="padding:.35rem .5rem;text-align:right;color:#6b7280;">${{ number_format($d->unit_price, 2) }}</td>
+                                                    <td style="padding:.35rem .5rem;text-align:right;font-weight:600;color:#dc6336;">${{ number_format($d->total, 2) }}</td>
+                                                </tr>
+                                                @endforeach
+                                            </tbody>
+                                            @if(isset($s->venta))
+                                            <tfoot>
+                                                <tr>
+                                                    <td colspan="3" style="padding:.4rem .5rem;text-align:right;font-weight:700;border-top:2px solid #e5e7eb;">Total</td>
+                                                    <td style="padding:.4rem .5rem;text-align:right;font-weight:700;color:#111827;border-top:2px solid #e5e7eb;">${{ number_format($s->venta->total, 2) }}</td>
+                                                </tr>
+                                            </tfoot>
+                                            @endif
+                                        </table>
+                                    @else
+                                        <span style="color:#9ca3af;font-size:.82rem;">Sin detalle de compra registrado.</span>
+                                    @endif
+                                </div>
+                            </td>
+                        </tr>
                         @endforeach
                     </tbody>
                 </table>
             @endif
         </div>
     </div>
+
+<script>
+function toggleDetalle(id) {
+    const row = document.getElementById('detalle-' + id);
+    row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+}
+</script>
 
 </x-app-layout>
