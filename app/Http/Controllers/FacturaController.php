@@ -13,7 +13,7 @@ class FacturaController extends Controller
         $venta = null;
         if ($request->filled('ticket')) {
             $venta = DB::table('sales')
-                ->where('id', $request->ticket)
+                ->where('invoice_number', $request->ticket)
                 ->whereNull('deleted_at')
                 ->first();
 
@@ -52,7 +52,7 @@ class FacturaController extends Controller
             'id_venta', 'rfc', 'nombre', 'codigo_postal', 'regimen_fiscal', 'uso_cfdi', 'email'
         ));
 
-        return back()->with('success', true);
+        return back()->withInput()->with('success', true);
     }
 
     public function panel()
