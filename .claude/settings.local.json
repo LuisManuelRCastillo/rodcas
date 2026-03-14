@@ -9,7 +9,16 @@
       "Bash(php artisan migrate:status)",
       "Bash(php artisan migrate --pretend --path=database/migrations/2025_09_06_170214_create_clientes_table.php)",
       "Bash(php artisan db:seed --class=MarkMigrationsAsRun)",
-      "Bash(php artisan migrate --force --path=database/migrations/2026_03_05_033950_add_descripcion_to_cotizacion_detalles_table.php)"
+      "Bash(php artisan migrate --force --path=database/migrations/2026_03_05_033950_add_descripcion_to_cotizacion_detalles_table.php)",
+      "Bash(php artisan:*)",
+      "Bash(New-Item -ItemType File -Path \"C:\\\\Users\\\\luism\\\\Desktop\\\\rodcas\\\\database\\\\database.sqlite\" -Force)",
+      "Bash(netstat -ano)",
+      "Bash(tasklist)",
+      "Bash(grep -E \"\\\\.err$\")",
+      "Bash(rm -f multi-master.info)",
+      "Bash(rm -f master-*.info)",
+      "Bash(rm -f relay-log-*.info)",
+      "Bash(rm -f mysql-relay-bin-*.*)"
     ]
   }
 }

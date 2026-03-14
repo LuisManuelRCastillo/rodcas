@@ -1,8 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ProductoController; 
+use App\Http\Controllers\ProductoController;
 use App\Http\Controllers\CotizacionController;
+use App\Http\Controllers\FacturaController;
 
 
 Route::get('/', function () {
@@ -27,3 +28,13 @@ Route::middleware([
 
 Route::get('/catalogo', [ProductoController::class, 'index'])->name('catalogo');
 Route::get('/inventario', [App\Http\Controllers\InventarioController::class, 'index'])->name('stockView');
+
+// Solicitud de factura (pública — sin auth)
+Route::get('/factura', [FacturaController::class, 'form'])->name('factura.form');
+Route::post('/factura', [FacturaController::class, 'store'])->name('factura.store');
+
+// Panel interno de facturas (requiere auth)
+Route::middleware(['auth:sanctum', config('jetstream.auth_session'), 'verified'])->group(function () {
+    Route::get('/facturas', [FacturaController::class, 'panel'])->name('facturas.panel');
+    Route::patch('/facturas/{id}/completar', [FacturaController::class, 'completar'])->name('facturas.completar');
+});
