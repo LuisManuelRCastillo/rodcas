@@ -184,6 +184,7 @@
                     <thead>
                         <tr>
                             <th>#</th>
+                            <th>Ticket</th>
                             <th>RFC</th>
                             <th>Nombre / Razón Social</th>
                             <th>C.P.</th>
@@ -199,6 +200,15 @@
                         @foreach($lista as $s)
                         <tr>
                             <td style="color:#9ca3af;font-size:.78rem;">{{ $s->id }}</td>
+                            <td>
+                                @if($s->id_venta && isset($s->venta))
+                                    <span class="rfc-chip">{{ $s->venta->invoice_number }}</span>
+                                @elseif($s->id_venta)
+                                    <span class="rfc-chip">#{{ $s->id_venta }}</span>
+                                @else
+                                    <span style="color:#d1d5db;">—</span>
+                                @endif
+                            </td>
                             <td><span class="rfc-chip">{{ $s->rfc }}</span></td>
                             <td><strong>{{ $s->nombre }}</strong></td>
                             <td>{{ $s->codigo_postal }}</td>

@@ -4,12 +4,26 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\SolicitudFactura;
+use Illuminate\Support\Facades\DB;
 
 class FacturaController extends Controller
 {
-    public function form()
+    public function form(Request $request)
     {
-        return view('factura.form');
+        $venta = null;
+        if ($request->filled('ticket')) {
+            $venta = DB::table('sales')
+                ->where('id', $request->ticket)
+                ->whereNull('deleted_at')
+                ->first();
+
+            if ($venta) {
+                $venta->detalles = DB::table('sale_details')
+                    ->where('sale_id', $venta->id)
+                    ->get();
+            }
+        }
+        return view('factura.form', compact('venta'));
     }
 
     public function store(Request $request)
@@ -35,7 +49,7 @@ class FacturaController extends Controller
         ]);
 
         SolicitudFactura::create($request->only(
-            'rfc', 'nombre', 'codigo_postal', 'regimen_fiscal', 'uso_cfdi', 'email'
+            'id_venta', 'rfc', 'nombre', 'codigo_postal', 'regimen_fiscal', 'uso_cfdi', 'email'
         ));
 
         return back()->with('success', true);
@@ -43,7 +57,12 @@ class FacturaController extends Controller
 
     public function panel()
     {
-        $solicitudes = SolicitudFactura::latest()->get();
+        $solicitudes = SolicitudFactura::latest()->get()->map(function ($s) {
+            if ($s->id_venta) {
+                $s->venta = DB::table('sales')->where('id', $s->id_venta)->first();
+            }
+            return $s;
+        });
         return view('factura.panel', compact('solicitudes'));
     }
 

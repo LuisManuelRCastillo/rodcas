@@ -18,6 +18,9 @@
                      <x-nav-link href="{{ route('stockView') }}" :active="request()->routeIs('stockView')">
                         {{ __('Inventario') }}
                     </x-nav-link>
+                    <x-nav-link href="{{ route('facturas.panel') }}" :active="request()->routeIs('facturas.panel')">
+                        {{ __('Facturas') }}
+                    </x-nav-link>
                 </div>
             </div>
 
@@ -147,6 +150,9 @@
                     </x-nav-link>
                      <x-nav-link href="{{ route('stockView') }}" :active="request()->routeIs('stockView')">
                         {{ __('Inventario') }}
+                    </x-nav-link>
+                    <x-nav-link href="{{ route('facturas.panel') }}" :active="request()->routeIs('facturas.panel')">
+                        {{ __('Facturas') }}
                     </x-nav-link>
         </div>
 

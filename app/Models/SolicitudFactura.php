@@ -9,6 +9,6 @@ class SolicitudFactura extends Model
     protected $table = 'solicitudes_factura';
 
     protected $fillable = [
-        'rfc', 'nombre', 'codigo_postal', 'regimen_fiscal', 'uso_cfdi', 'email', 'estatus',
+        'id_venta', 'rfc', 'nombre', 'codigo_postal', 'regimen_fiscal', 'uso_cfdi', 'email', 'estatus',
     ];
 }

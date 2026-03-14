@@ -107,6 +107,44 @@
             color: #9ca3af;
             line-height: 1.6;
         }
+
+        /* ── Resumen de compra ── */
+        .ticket-card {
+            background: #fafafa;
+            border: 1.5px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 1rem 1.1rem;
+            margin-bottom: 1.25rem;
+        }
+        .ticket-title {
+            font-size: .72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .07em;
+            color: #9ca3af;
+            margin-bottom: .6rem;
+        }
+        .ticket-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: .82rem;
+            color: #374151;
+            padding: .25rem 0;
+            border-bottom: 1px solid #f3f4f6;
+        }
+        .ticket-row:last-child { border-bottom: none; }
+        .ticket-row .item-name { color: #1f2937; }
+        .ticket-row .item-price { font-weight: 600; color: var(--brand); }
+        .ticket-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: .95rem;
+            font-weight: 700;
+            color: #111827;
+            margin-top: .6rem;
+            padding-top: .5rem;
+            border-top: 2px solid #e5e7eb;
+        }
     </style>
 </head>
 <body>
@@ -130,6 +168,24 @@
 
         <form method="POST" action="{{ route('factura.store') }}">
             @csrf
+            @if($venta)
+                <input type="hidden" name="id_venta" value="{{ $venta->id }}">
+
+                {{-- Resumen de compra --}}
+                <div class="ticket-card">
+                    <div class="ticket-title">Ticket {{ $venta->invoice_number }}</div>
+                    @foreach($venta->detalles as $d)
+                        <div class="ticket-row">
+                            <span class="item-name">{{ $d->product_name }} <span style="color:#9ca3af;">x{{ $d->quantity }}</span></span>
+                            <span class="item-price">${{ number_format($d->total, 2) }}</span>
+                        </div>
+                    @endforeach
+                    <div class="ticket-total">
+                        <span>Total</span>
+                        <span>${{ number_format($venta->total, 2) }}</span>
+                    </div>
+                </div>
+            @endif
 
             <div class="row2">
                 <div class="field">

@@ -18,7 +18,9 @@
       "Bash(rm -f multi-master.info)",
       "Bash(rm -f master-*.info)",
       "Bash(rm -f relay-log-*.info)",
-      "Bash(rm -f mysql-relay-bin-*.*)"
+      "Bash(rm -f mysql-relay-bin-*.*)",
+      "Bash(mysql -u root -e \"USE lurapos; SHOW TABLES;\")",
+      "Bash(mysql -u root rodcas -e \"DESCRIBE sales; DESCRIBE sale_details;\")"
     ]
   }
 }

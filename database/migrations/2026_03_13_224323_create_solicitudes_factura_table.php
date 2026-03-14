@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('solicitudes_factura', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger('id_cotizacion')->nullable();
             $table->string('rfc', 13);
             $table->string('nombre');
             $table->string('codigo_postal', 10);
